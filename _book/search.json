@@ -1,0 +1,42 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "center-shiny-figure",
+    "section": "",
+    "text": "Preface\nTo understand this better, Figure Prediction contours for a linear regression model. shows a contour plot of a predicted linear regression model with various combinations of the model slope parameters. The two predictors are centered at zero with values ranging within \\(x_j \\pm 4.0\\)). The default setting shows a moderate synergistic interaction effect since all of the \\(\\beta_j = 1.0\\)). In the plot, darker values indicate smaller predicted values.\n\n\n\n\n#| label: fig-interaction-contours\n#| viewerHeight: 600\n#| standalone: true\n\nlibrary(shiny)\nlibrary(ggplot2)\nlibrary(bslib)\n\nui &lt;- fluidPage(\n  theme = bs_theme(bg = \"#fcfefe\", fg = \"#595959\"),\n  mainPanel(\n    fluidRow(\n      column(\n        width = 4,\n        align = \"center\",\n        sliderInput(\n          \"beta_1\",\n          label = \"Predictor 1 slope\",\n          min = -4.0,\n          max =  4.0,\n          step = 0.5,\n          value = 1\n        )\n      ),\n      column(\n        width = 4,\n        align = \"center\",\n        sliderInput(\n          \"beta_2\",\n          label = \"Predictor 2 slope\",\n          min = -4.0,\n          max =  4.0,\n          step = 0.5,\n          value = 1\n        )\n      ),\n      column(\n        width = 4,\n        align = \"center\",\n        sliderInput(\n          \"beta_int\",\n          label = \"Interaction slope\",\n          min = -2.0,\n          max =  2.0,\n          step = 0.25,\n          value = 0.5\n        )\n      )\n    ), # row\n    fluidRow(\n      column(width =  1),\n      column(width = 10.0, align = \"center\", plotOutput('contours')),\n      column(width =  1)\n    ) # row\n  )  # main\n) # ui page\n\n\n\nserver &lt;- function(input, output) {\n  \n  light_bg &lt;- \"#fcfefe\" # from aml4td.scss\n  grid_theme &lt;- bs_theme(\n    bg = \"#fcfefe\", fg = \"#595959\"\n  )\n  \n  # ------------------------------------------------------------------------------\n  \n  theme_light_bl&lt;- function(...) {\n    \n    ret &lt;- ggplot2::theme_bw(...)\n    \n    col_rect &lt;- ggplot2::element_rect(fill = light_bg, colour = light_bg)\n    ret$panel.background  &lt;- col_rect\n    ret$plot.background   &lt;- col_rect\n    ret$legend.background &lt;- col_rect\n    ret$legend.key        &lt;- col_rect\n    \n    ret$legend.position &lt;- \"top\"\n    \n    ret\n  }\n  \n  # ------------------------------------------------------------------------------\n  \n  n_grid &lt;- 100\n  grid_1d &lt;- seq(-1, 1, length.out = n_grid)\n  grid &lt;- expand.grid(A = grid_1d, B = grid_1d)\n\n  output$contours &lt;-\n    renderPlot({\n      # browser()\n      grid$outcome &lt;- \n        input$beta_1 * grid$A + input$beta_2 * grid$B + \n        input$beta_int * grid$A * grid$B\n      \n      p &lt;- \n        ggplot(grid, aes(A, B)) +\n        coord_equal() +\n        labs(x = \"Predictor 1\", y = \"Predictor 1\") +\n        theme_light_bl()\n      \n      if (length(unique(grid$outcome)) &gt;= 15) {\n        p &lt;- p + \n          geom_contour_filled(aes(z = scale(outcome)), bins = 15, show.legend = FALSE) +\n          scale_fill_viridis_d(option = \"G\")\n      }\n\n      print(p)\n      \n    })\n}\n\napp &lt;- shinyApp(ui, server)\n\n\n\nFigure 1: Prediction contours for a linear regression model.",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "intro.html",
+    "href": "intro.html",
+    "title": "1  Introduction",
+    "section": "",
+    "text": "This is a book created from markdown and executable code.\nSee Knuth (1984) for additional discussion of literate programming.\n\n1 + 1\n\n[1] 2\n\n\n\n\n\n\nKnuth, Donald E. 1984. “Literate Programming.” Comput. J. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
+    ]
+  },
+  {
+    "objectID": "summary.html",
+    "href": "summary.html",
+    "title": "2  Summary",
+    "section": "",
+    "text": "In summary, this book has no content whatsoever.\n\n1 + 1\n\n[1] 2",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Summary</span>"
+    ]
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References",
+    "section": "",
+    "text": "Knuth, Donald E. 1984. “Literate Programming.” Comput.\nJ. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
+    "crumbs": [
+      "References"
+    ]
+  }
+]
