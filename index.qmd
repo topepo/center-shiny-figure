@@ -1,7 +1,7 @@
 # Preface {.unnumbered}
 
 
-To understand this better, @fig-interaction-contours shows a contour plot of a predicted linear regression model with various combinations of the model slope parameters. The two predictors are centered at zero with values ranging within $x_j \pm 4.0$). The default setting shows a moderate synergistic interaction effect since all of the $\beta_j = 1.0$). In the plot, darker values indicate smaller predicted values.   
+To understand this better, @fig-interaction-contours shows a contour plot of a predicted linear regression model with various combinations of the model slope parameters. The two predictors are centered at zero with values ranging within $x_j \pm 4.0$). The default setting shows a moderate synergistic interaction effect since all of the $\beta_j = 1.0$). In the plot, darker values indicate smaller predicted values.
 
 ::: {#fig-interaction-contours}
 
@@ -16,83 +16,71 @@ library(shiny)
 library(ggplot2)
 library(bslib)
 
-ui <- fluidPage(
+ui <- page_fillable(
   theme = bs_theme(bg = "#fcfefe", fg = "#595959"),
-  mainPanel(
-    fluidRow(
-      column(
-        width = 4,
-        align = "center",
-        sliderInput(
-          "beta_1",
-          label = "Predictor 1 slope",
-          min = -4.0,
-          max =  4.0,
-          step = 0.5,
-          value = 1
-        )
-      ),
-      column(
-        width = 4,
-        align = "center",
-        sliderInput(
-          "beta_2",
-          label = "Predictor 2 slope",
-          min = -4.0,
-          max =  4.0,
-          step = 0.5,
-          value = 1
-        )
-      ),
-      column(
-        width = 4,
-        align = "center",
-        sliderInput(
-          "beta_int",
-          label = "Interaction slope",
-          min = -2.0,
-          max =  2.0,
-          step = 0.25,
-          value = 0.5
-        )
-      )
-    ), # row
-    fluidRow(
-      column(width =  1),
-      column(width = 10.0, align = "center", plotOutput('contours')),
-      column(width =  1)
-    ) # row
-  )  # main
-) # ui page
+  padding = "1rem",
+  layout_columns(
+    fill = FALSE,
+    col_widths = breakpoints(xs = c(-2, 8, -2), sm = 4),
+    sliderInput(
+      "beta_1",
+      label = "Predictor 1 slope",
+      min = -4.0,
+      max = 4.0,
+      step = 0.5,
+      value = 1,
+      ticks = FALSE
+    ),
+    sliderInput(
+      "beta_2",
+      label = "Predictor 2 slope",
+      min = -4.0,
+      max = 4.0,
+      step = 0.5,
+      value = 1,
+      ticks = FALSE
+    ),
+    sliderInput(
+      "beta_int",
+      label = "Interaction slope",
+      min = -2.0,
+      max = 2.0,
+      step = 0.25,
+      value = 0.5,
+      ticks = FALSE
+    )
+  ),
+  as_fill_carrier(plotOutput("contours"))
+)
 
 
 
 server <- function(input, output) {
-  
+
   light_bg <- "#fcfefe" # from aml4td.scss
   grid_theme <- bs_theme(
     bg = "#fcfefe", fg = "#595959"
   )
-  
+
   # ------------------------------------------------------------------------------
-  
+
   theme_light_bl<- function(...) {
-    
+
     ret <- ggplot2::theme_bw(...)
-    
+
     col_rect <- ggplot2::element_rect(fill = light_bg, colour = light_bg)
     ret$panel.background  <- col_rect
     ret$plot.background   <- col_rect
     ret$legend.background <- col_rect
     ret$legend.key        <- col_rect
-    
+
     ret$legend.position <- "top"
-    
+
     ret
   }
-  
+
   # ------------------------------------------------------------------------------
-  
+
   n_grid <- 100
   grid_1d <- seq(-1, 1, length.out = n_grid)
   grid <- expand.grid(A = grid_1d, B = grid_1d)
@@ -100,24 +88,24 @@ server <- function(input, output) {
   output$contours <-
     renderPlot({
       # browser()
-      grid$outcome <- 
-        input$beta_1 * grid$A + input$beta_2 * grid$B + 
+      grid$outcome <-
+        input$beta_1 * grid$A + input$beta_2 * grid$B +
         input$beta_int * grid$A * grid$B
-      
-      p <- 
+
+      p <-
         ggplot(grid, aes(A, B)) +
         coord_equal() +
         labs(x = "Predictor 1", y = "Predictor 1") +
         theme_light_bl()
-      
+
       if (length(unique(grid$outcome)) >= 15) {
-        p <- p + 
+        p <- p +
           geom_contour_filled(aes(z = scale(outcome)), bins = 15, show.legend = FALSE) +
           scale_fill_viridis_d(option = "G")
       }
 
       print(p)
-      
+
     })
 }
 
@@ -126,6 +114,6 @@ app <- shinyApp(ui, server)
 
 :::
 
-Prediction contours for a linear regression model. 
+Prediction contours for a linear regression model.
 
 :::
