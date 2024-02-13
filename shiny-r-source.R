@@ -1,16 +1,3 @@
-# Preface {.unnumbered}
-
-
-To understand this better, @fig-interaction-contours shows a contour plot of a predicted linear regression model with various combinations of the model slope parameters. The two predictors are centered at zero with values ranging within $x_j \pm 4.0$). The default setting shows a moderate synergistic interaction effect since all of the $\beta_j = 1.0$). In the plot, darker values indicate smaller predicted values.
-
-::: {#fig-interaction-contours}
-
-::: {.figure-content}
-
-```{shinylive-r}
-#| label: fig-interaction-contours
-#| viewerHeight: 600
-#| standalone: true
 
 library(shiny)
 library(ggplot2)
@@ -56,86 +43,57 @@ ui <- page_fillable(
 
 
 server <- function(input, output) {
-
+  
   light_bg <- "#fcfefe" # from aml4td.scss
   grid_theme <- bs_theme(
     bg = "#fcfefe", fg = "#595959"
   )
-
+  
   # ------------------------------------------------------------------------------
-
+  
   theme_light_bl<- function(...) {
-
+    
     ret <- ggplot2::theme_bw(...)
-
+    
     col_rect <- ggplot2::element_rect(fill = light_bg, colour = light_bg)
     ret$panel.background  <- col_rect
     ret$plot.background   <- col_rect
     ret$legend.background <- col_rect
     ret$legend.key        <- col_rect
-
+    
     ret$legend.position <- "top"
-
+    
     ret
   }
-
+  
   # ------------------------------------------------------------------------------
-
+  
   n_grid <- 100
   grid_1d <- seq(-1, 1, length.out = n_grid)
   grid <- expand.grid(A = grid_1d, B = grid_1d)
-
+  
   output$contours <-
     renderPlot({
       # browser()
       grid$outcome <-
         input$beta_1 * grid$A + input$beta_2 * grid$B +
         input$beta_int * grid$A * grid$B
-
+      
       p <-
         ggplot(grid, aes(A, B)) +
         coord_equal() +
         labs(x = "Predictor 1", y = "Predictor 1") +
         theme_light_bl()
-
+      
       if (length(unique(grid$outcome)) >= 15) {
         p <- p +
           geom_contour_filled(aes(z = scale(outcome)), bins = 15, show.legend = FALSE) +
           scale_fill_viridis_d(option = "G")
       }
-
+      
       print(p)
-
+      
     })
 }
 
 app <- shinyApp(ui, server)
-```
-
-:::
-
-Prediction contours for a linear regression model.
-
-:::
-
-
-## sourcing the file
-
-
-
-::: {#fig-sourced}
-
-::: {.figure-content}
-
-```{shinylive-r}
-#| label: fig-sourced
-#| viewerHeight: 600
-#| standalone: true
-#| file: shiny-r-source.R
-```
-
-:::
-
-Trying to source the file
-
-:::
